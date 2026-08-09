@@ -8,4 +8,12 @@
 #   matcolor --scheme scheme-expressive
 #
 # Ported from end-4/dots-hyprland (illogical-impulse).
-exec "$HOME/.local/share/matyou/venv/bin/python" "$HOME/.local/share/matyou/generate.py" "$@"
+#
+# Defaults applied to every run. argparse takes the last occurrence of a flag, so
+# passing the same flag on the command line overrides whatever is set here.
+# Edit this line to change your baseline look.
+: "${MATYOU_DEFAULTS:=--scheme scheme-neutral --background #1A1A1A}"
+
+# shellcheck disable=SC2086  # word splitting is intentional for the defaults
+exec "$HOME/.local/share/matyou/venv/bin/python" \
+     "$HOME/.local/share/matyou/generate.py" $MATYOU_DEFAULTS "$@"

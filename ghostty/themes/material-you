@@ -2,13 +2,13 @@
 # Do not edit; it is overwritten on every run.
 # source: #707884   scheme: scheme-neutral   mode: dark
 
-background = #121214
+background = #1A1A1A
 foreground = #B1C0BB
 cursor-color = #B1C0BB
 selection-background = #BDBFC5
 selection-foreground = #393C40
 
-palette = 0=#121214
+palette = 0=#1A1A1A
 palette = 1=#B680FF
 palette = 2=#4BC9C9
 palette = 3=#4DD9BB

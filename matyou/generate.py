@@ -297,6 +297,9 @@ def main():
                    help="use upstream's tone multiply (blows bright colours out to white)")
     p.add_argument("--no-blend-bg-fg", action="store_true",
                    help="keep the base scheme's background instead of the Material surface")
+    p.add_argument("--background", metavar="HEX",
+                   help="pin the terminal background to an exact colour (e.g. '#1A1A1A') "
+                        "instead of deriving it from surfaceContainerLow")
     p.add_argument("--opacity", type=int, default=100, help="background alpha 0-100 for OSC 11")
     p.add_argument("--no-reload", action="store_true", help="write files but don't touch open terminals")
     p.add_argument("--quiet", action="store_true")
@@ -384,6 +387,14 @@ def main():
             out = harmonize(hex_to_argb(val), primary_argb, args.harmonize_threshold, args.harmony)
             out = boost_fg(out, args.term_fg_boost, dark, args.legacy_fg_boost)
         term[name] = argb_to_hex(out)
+
+    # A pinned background wins over the derived surface tint. Applied after the loop so
+    # the other fifteen colours are still harmonised against the accent as usual.
+    if args.background:
+        bg_hex = args.background if args.background.startswith("#") else "#" + args.background
+        if len(bg_hex) != 7:
+            sys.exit(f"--background expects a 6-digit hex colour, got {args.background!r}")
+        term["term0"] = bg_hex.upper()
 
     # ---- the slot-hijack map: rarely-used ANSI indices carry Material roles
     overrides = {
