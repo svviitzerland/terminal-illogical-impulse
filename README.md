@@ -1,22 +1,26 @@
-# ghostty-illogical-impulse
+# terminal-illogical-impulse
 
-The terminal half of [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland)
-(illogical-impulse), ported to **Ghostty on macOS** — with zsh instead of fish.
+The terminal look of [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland)
+(illogical-impulse), ported to **macOS Terminal.app** — with zsh instead of fish.
 
-Wallpaper-driven Material You colours, a two-line capsule prompt, and a `matcolor`
-command that repaints every open terminal instantly.
+Wallpaper-driven Material You colours, a two-line capsule starship prompt, and a
+`matcolor` command that repaints every open terminal instantly.
+
+> Earlier versions of this repo targeted Ghostty. That is gone; the design is the same,
+> the target is now the stock Terminal.app. The Ghostty config is still in the git
+> history if you want it back.
 
 ## Install
 
 ```sh
-git clone https://github.com/<you>/ghostty-illogical-impulse.git
-cd ghostty-illogical-impulse
+git clone https://github.com/<you>/terminal-illogical-impulse.git
+cd terminal-illogical-impulse
 ./install.sh
 ```
 
-It installs `starship`, `eza` and JetBrains Mono Nerd Font via Homebrew, creates an
-isolated Python venv for the colour generator, symlinks the configs, and appends a
-block to `~/.zshrc`. Nothing is overwritten without a `.bak` copy first.
+Installs `starship`, `eza` and JetBrains Mono Nerd Font via Homebrew, creates an
+isolated Python venv for the colour generator, links the configs, and appends a block to
+`~/.zshrc`. Anything it replaces is backed up with a timestamped `.bak` first.
 
 ## Retheming
 
@@ -24,17 +28,40 @@ block to `~/.zshrc`. Nothing is overwritten without a `.bak` copy first.
 matcolor                              # current macOS wallpaper
 matcolor ~/Pictures/wallpaper.jpg     # a specific image (HEIC/JPG/PNG/RAW)
 matcolor --color '#8A8F98'            # an explicit accent, no image
+matcolor --background '#1A1A1A'       # pin the background exactly
 matcolor --scheme scheme-neutral      # nine Material schemes; see --help
 matcolor --mode light                 # default follows the macOS appearance
 ```
 
-Open terminals repaint immediately via OSC sequences; new windows read the generated
-theme file at launch.
+Open windows repaint immediately. `matcolor` also rewrites your Terminal.app profile,
+which new windows pick up — see below for why both are needed.
+
+Baseline flags live in one line near the top of `matyou/matcolor`:
+
+```sh
+: "${MATYOU_DEFAULTS:=--scheme scheme-neutral --background #1A1A1A}"
+```
+
+Flags passed on the command line still win, since argparse takes the last occurrence.
 
 > Apple's *Aerial* (video) wallpapers are streamed, not stored, so there is no image for
 > `matcolor` to sample. Pass a file or use `--color` if your desktop is one.
 
-## How it works
+## Why Terminal.app needs two mechanisms
+
+Terminal.app honours **OSC 4**, so the sixteen ANSI colours plus the hijacked 232–255
+slots are set by escape sequences that `~/.zshrc` emits at every shell start. That is
+what repaints already-open windows.
+
+It does **not** honour OSC 10/11 for its own default background and text colour — those
+live in the profile, and Terminal.app has no config file for them. So `matcolor` also
+drives the profile over AppleScript. Without that half, the font stays SF Mono and every
+Nerd Font glyph renders as tofu.
+
+Skip it with `--no-terminal-app`, or target a specific profile with
+`--terminal-profile "Basic"`.
+
+## How the colours work
 
 1. The image is quantised, a dominant colour is scored, and a Material 3 dynamic scheme
    is built around it.
@@ -66,20 +93,26 @@ python3 -c "s=open('starship/starship.toml',encoding='utf-8').read(); \
 print('caps:', s.count(chr(0xE0B6)), s.count(chr(0xE0B4)))"   # expect: caps: 5 5
 ```
 
+## Default terminal
+
+```sh
+./set-default-terminal.sh
+```
+
+Sets the LaunchServices handler for `.sh`, `.zsh`, `.command`, `.tool` and unix
+executables to Terminal.app. Two things it cannot do: `.bash` (Terminal.app does not
+declare `public.bash-script`, so LaunchServices refuses it), and Finder's *New Terminal
+at Folder* service, which macOS hardcodes.
+
 ## Deviations from upstream
 
 - **Bright-colour boost.** Upstream multiplies HCT tone by `1 + 0.35` in dark mode. The
-  Gruvbox bright colours already sit at tone 73-80, so that clamps them all to 100 and
+  Gruvbox bright colours already sit at tone 73–80, so that clamps them all to 100 and
   bright green, yellow and cyan render as identical pure white. This port interpolates
   the remaining headroom instead. `--legacy-fg-boost` restores bit-exact upstream output.
 - **zsh, not fish** — same prompt, same `eza` aliases.
-- **No `cursor_trail`**; Ghostty has no equivalent to kitty's trailing cursor.
-- **Titlebar** is `transparent` rather than absent. `macos-titlebar-style = hidden` gives
-  the fully chrome-less Hyprland look, at the cost of the window buttons.
-- **Opaque background**, matching upstream's `term_alpha=100`. `background-opacity` and
-  `background-blur` are commented out in `ghostty/config`.
-- **`window-padding-balance` must stay false** — balancing spreads the grid's leftover
-  space across all four sides, quietly inflating the top padding.
+- **Pinned background.** `--background` overrides the derived surface tint, which
+  otherwise pulls the background towards the accent and fights a neutral palette.
 
 ## Credit
 

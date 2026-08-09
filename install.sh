@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Install the illogical-impulse Ghostty port. Idempotent; backs up anything it replaces.
+# Install the illogical-impulse look for macOS Terminal.app.
+# Idempotent; backs up anything it replaces.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,23 +11,18 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 
 say() { printf '\033[1m==>\033[0m %s\n' "$1"; }
 
-[[ "$(uname)" == "Darwin" ]] || { echo "This port targets macOS."; exit 1; }
+[[ "$(uname)" == "Darwin" ]] || { echo "This targets macOS Terminal.app."; exit 1; }
 command -v brew >/dev/null || { echo "Homebrew is required: https://brew.sh"; exit 1; }
 
 say "Installing starship, eza and JetBrains Mono Nerd Font"
 brew install --quiet starship eza
 brew install --quiet --cask font-jetbrains-mono-nerd-font
-if ! [ -d "/Applications/Ghostty.app" ]; then
-  say "Ghostty not found — installing"
-  brew install --quiet --cask ghostty
-fi
 
 say "Creating the colour-generator venv"
-mkdir -p "$SHARE" "$BIN" "$HOME/.local/state/matyou" "$CONFIG/ghostty/themes"
+mkdir -p "$SHARE" "$BIN" "$HOME/.local/state/matyou"
 [ -d "$SHARE/venv" ] || python3 -m venv "$SHARE/venv"
 "$SHARE/venv/bin/pip" install --quiet --upgrade pip materialyoucolor pillow numpy
 
-# back up then link, so the repo stays the single source of truth
 link() {
   local src="$1" dst="$2"
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
@@ -37,11 +33,10 @@ link() {
 }
 
 say "Linking configs"
-link "$REPO/ghostty/config"            "$CONFIG/ghostty/config"
-link "$REPO/starship/starship.toml"    "$CONFIG/starship.toml"
-link "$REPO/matyou/generate.py"        "$SHARE/generate.py"
-link "$REPO/matyou/scheme-base.json"   "$SHARE/scheme-base.json"
-link "$REPO/matyou/matcolor"           "$BIN/matcolor"
+link "$REPO/starship/starship.toml"  "$CONFIG/starship.toml"
+link "$REPO/matyou/generate.py"      "$SHARE/generate.py"
+link "$REPO/matyou/scheme-base.json" "$SHARE/scheme-base.json"
+link "$REPO/matyou/matcolor"         "$BIN/matcolor"
 chmod +x "$REPO/matyou/matcolor"
 
 say "Wiring ~/.zshrc"
@@ -58,8 +53,8 @@ case ":$PATH:" in
   *) say "Add \$HOME/.local/bin to your PATH to use \`matcolor\` directly" ;;
 esac
 
-say "Generating a first theme"
-"$BIN/matcolor" --scheme scheme-neutral --color '#8A8F98' --mode dark || \
-  say "Theme generation skipped — run \`matcolor <image>\` yourself"
+say "Generating a first theme and setting the Terminal.app profile"
+"$BIN/matcolor" || say "Theme generation skipped — run \`matcolor <image>\` yourself"
 
-say "Done. Open a new Ghostty window."
+say "Done. Open a new Terminal window."
+say "Run ./set-default-terminal.sh if you also want Terminal.app to own .sh/.command."
