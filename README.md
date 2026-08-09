@@ -81,6 +81,23 @@ Skip it with `--no-terminal-app`, or target a specific profile with
    re-themes itself without ever being regenerated. That trick is upstream's, and it is
    the neatest idea in the whole project.
 
+## Stray `[` and `]` around the command you just ran
+
+Terminal.app auto-marks every prompt line and draws that mark as a bracket pair at the
+far left and far right of the line. With a two-line prompt it reads as a stray `[` and
+`]` wrapping your command. They are drawn decoration, not text — they never appear in
+the scrollback buffer, which is what makes this confusing to chase.
+
+`set-default-terminal.sh` turns it off, or do it by hand:
+
+```sh
+defaults write com.apple.Terminal AutoMarkPromptLines -bool false
+```
+
+Quit Terminal.app completely (Cmd-Q) afterwards. There is no key that keeps the marks
+while hiding the indicator, so the cost is that Cmd-Up / Cmd-Down prompt navigation and
+Cmd-L "clear to previous mark" lose their automatic anchors.
+
 ## If the pill caps go square
 
 The round ends of each pill are two Private Use Area characters, **U+E0B6** and
