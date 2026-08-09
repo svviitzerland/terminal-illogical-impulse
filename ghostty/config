@@ -1,0 +1,66 @@
+# Ghostty — illogical-impulse look, ported from end-4/dots-hyprland
+# Theme is generated from your wallpaper: run `matcolor` (see ~/.local/bin/matcolor).
+
+# ── Theme ─────────────────────────────────────────────────────────────────────
+# Regenerate with:  matcolor ~/Pictures/wallpaper.jpg
+theme = material-you
+
+# ── Font ──────────────────────────────────────────────────────────────────────
+# end-4 uses JetBrains Mono Nerd Font at 11pt on Linux; 13 matches that optical
+# size on a Retina display.
+font-family = JetBrainsMono Nerd Font Mono
+font-size = 13
+font-thicken = true
+
+# Ghostty draws the Powerline range (U+E0B0-U+E0D4) with its own internal sprites
+# rather than the font, so the pill caps are seamless with the cell grid. If your
+# build ever renders the half circles U+E0B4-U+E0B7 badly, uncomment this to fall
+# back to the Nerd Font's own glyphs:
+# font-codepoint-map = U+E0B4-U+E0B7=JetBrainsMono Nerd Font
+
+# ── Cursor ────────────────────────────────────────────────────────────────────
+# kitty.conf uses `cursor_shape beam`. Ghostty has no cursor_trail equivalent.
+cursor-style = bar
+cursor-style-blink = false
+adjust-cursor-thickness = 1
+
+# ── Window ────────────────────────────────────────────────────────────────────
+# Upstream is generous all round (kitty: window_margin_width 21.75 · foot: pad=25x25).
+# Kept tight here: on macOS the transparent titlebar already contributes ~28pt above the
+# first line, so much y padding on top of that read as too deep.
+window-padding-x = 2
+window-padding-y = 2
+# Must stay false: balancing splits the grid's leftover space evenly across all four
+# sides, which would silently add to the 2pt top padding above.
+window-padding-balance = false
+window-padding-color = background
+
+# Blends the titlebar into the terminal background. Swap to `hidden` for the
+# fully chrome-less Hyprland look (you lose the traffic-light buttons).
+macos-titlebar-style = transparent
+macos-option-as-alt = true
+window-colorspace = display-p3
+
+# Uncomment for a translucent, blurred window. end-4 ships opaque by default
+# (term_alpha=100) but the screenshots you have seen are usually translucent.
+# background-opacity = 0.92
+# background-blur = 20
+
+# ── Behaviour ─────────────────────────────────────────────────────────────────
+# kitty: confirm_os_window_close 0
+confirm-close-surface = false
+mouse-hide-while-typing = true
+copy-on-select = clipboard
+scrollback-limit = 10000000
+
+# ── Keybindings ───────────────────────────────────────────────────────────────
+# Mirrors the kitty/foot bindings where they do not fight macOS conventions.
+keybind = page_up=scroll_page_up
+keybind = page_down=scroll_page_down
+
+keybind = ctrl+plus=increase_font_size:1
+keybind = ctrl+equal=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+zero=reset_font_size
+
+# Cmd+F is already `start_search`, Cmd+C/V already copy/paste — left as-is.

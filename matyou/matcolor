@@ -1,0 +1,11 @@
+#!/bin/sh
+# matcolor — retheme Ghostty (and every open terminal) from an image.
+#
+#   matcolor                      use the current macOS wallpaper
+#   matcolor ~/Pictures/wall.jpg  use a specific image
+#   matcolor --color '#7B4FA8'    use an explicit accent colour
+#   matcolor --mode light         force light mode (default follows macOS)
+#   matcolor --scheme scheme-expressive
+#
+# Ported from end-4/dots-hyprland (illogical-impulse).
+exec "$HOME/.local/share/matyou/venv/bin/python" "$HOME/.local/share/matyou/generate.py" "$@"
