@@ -1,3 +1,7 @@
+# Tools that spawn a terminal (lazygit, ranger, some git helpers) read $TERMINAL.
+# ~/.local/bin/ghostty is a symlink to the binary inside Ghostty.app.
+export TERMINAL=ghostty
+
 # --- illogical-impulse look (ported from end-4/dots-hyprland) ---
 # Material You palette. Ghostty reads themes/material-you at launch, but this also
 # repaints terminals that were already open when `matcolor` last ran.
