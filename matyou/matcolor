@@ -12,7 +12,7 @@
 # Defaults applied to every run. argparse takes the last occurrence of a flag, so
 # passing the same flag on the command line overrides whatever is set here.
 # Edit this line to change your baseline look.
-: "${MATYOU_DEFAULTS:=--scheme scheme-neutral --background #1A1A1A}"
+: "${MATYOU_DEFAULTS:=--scheme scheme-neutral --color #8A8F98 --background #1A1A1A}"
 
 # shellcheck disable=SC2086  # word splitting is intentional for the defaults
 exec "$HOME/.local/share/matyou/venv/bin/python" \

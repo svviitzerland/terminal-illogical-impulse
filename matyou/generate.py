@@ -474,19 +474,26 @@ def main():
         THEME_FILE.write_text("\n".join(lines) + "\n")
 
     # ---- OSC sequences for terminals that are already open
+    #
+    # Terminated with BEL rather than ST (ESC \). Both are legal, but Terminal.app is
+    # markedly happier with BEL, and every other terminal accepts it too.
+    #
+    # OSC 17/19 (selection background/foreground) are deliberately not emitted: they are
+    # an xterm extension that Terminal.app does not implement, and an unrecognised OSC
+    # can make its parser spill the remaining bytes onto the screen as stray text.
+    # Terminal.app sets selection colours from its own profile anyway.
+    ST = "\a"
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     osc = []
     for i in range(16):
-        osc.append(f"\033]4;{i};{term['term%d' % i]}\033\\")
+        osc.append(f"\033]4;{i};{term['term%d' % i]}{ST}")
     for idx, val in overrides.items():
-        osc.append(f"\033]4;{idx};{val}\033\\")
-    osc.append(f"\033]10;{fg}\033\\")                       # foreground
-    # The [alpha] prefix is a kitty extension; plain OSC 11 keeps Ghostty happy.
+        osc.append(f"\033]4;{idx};{val}{ST}")
+    osc.append(f"\033]10;{fg}{ST}")                         # foreground
+    # The [alpha] prefix is a kitty extension; a plain colour keeps everyone else happy.
     bg_spec = bg if args.opacity >= 100 else f"[{args.opacity}]{bg}"
-    osc.append(f"\033]11;{bg_spec}\033\\")                  # background
-    osc.append(f"\033]12;{fg}\033\\")                       # cursor
-    osc.append(f"\033]17;{material['onSecondaryContainer']}\033\\")  # selection bg
-    osc.append(f"\033]19;{material['secondaryContainer']}\033\\")    # selection fg
+    osc.append(f"\033]11;{bg_spec}{ST}")                    # background
+    osc.append(f"\033]12;{fg}{ST}")                         # cursor
     seq = "".join(osc)
     SEQ_FILE.write_text(seq)
 
